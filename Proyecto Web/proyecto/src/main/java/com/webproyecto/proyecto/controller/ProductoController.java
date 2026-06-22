@@ -31,9 +31,17 @@ public class ProductoController {
     }
 
     @PostMapping
-    public String guardarProducto(@ModelAttribute Producto producto) {
-        productoRepository.save(producto);
-        return "redirect:/productos";
+    public String guardarProducto(@ModelAttribute("producto") Producto producto) {
+        try {
+            if (producto.getNombre() != null && !producto.getNombre().isEmpty()) {
+                productoRepository.save(producto);
+                return "redirect:/productos";
+            }
+        } catch (Exception e) {
+            System.out.println("Error al guardar producto: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return "redirect:/productos/nuevo";
     }
 
     @GetMapping("/editar/{id}")
