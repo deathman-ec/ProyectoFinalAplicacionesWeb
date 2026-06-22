@@ -31,37 +31,27 @@ public class ProductoController {
     }
 
     @PostMapping
-    public String guardarProducto(
-            @RequestParam(required = false) String nombre,
-            @RequestParam(required = false) String descripcion,
-            @RequestParam(required = false) String categoria,
-            @RequestParam(required = false) Double precio,
-            @RequestParam(required = false) Integer cantidad,
-            @RequestParam(required = false) Long id,
-            Model model) {
+    public String guardarProducto(@RequestParam String nombre,
+                                   @RequestParam String descripcion,
+                                   @RequestParam(required = false) String categoria,
+                                   @RequestParam Double precio,
+                                   @RequestParam Integer cantidad,
+                                   @RequestParam(required = false) Long id,
+                                   Model model) {
+
+        System.out.println("=== DATOS RECIBIDOS ===");
+        System.out.println("Nombre: " + nombre);
+        System.out.println("Descripción: " + descripcion);
+        System.out.println("Categoría: " + categoria);
+        System.out.println("Precio: " + precio);
+        System.out.println("Cantidad: " + cantidad);
+        System.out.println("ID: " + id);
+        System.out.println("==================");
 
         try {
+            // Validación básica
             if (nombre == null || nombre.trim().isEmpty()) {
-                model.addAttribute("error", "El nombre del producto es requerido");
-                model.addAttribute("producto", new Producto());
-                return "productos/formulario";
-            }
-
-            if (descripcion == null || descripcion.trim().isEmpty()) {
-                model.addAttribute("error", "La descripción es requerida");
-                model.addAttribute("producto", new Producto());
-                return "productos/formulario";
-            }
-
-            if (precio == null || precio <= 0) {
-                model.addAttribute("error", "El precio debe ser mayor a 0");
-                model.addAttribute("producto", new Producto());
-                return "productos/formulario";
-            }
-
-            if (cantidad == null || cantidad < 0) {
-                model.addAttribute("error", "La cantidad no puede ser negativa");
-                model.addAttribute("producto", new Producto());
+                model.addAttribute("error", "El nombre es requerido");
                 return "productos/formulario";
             }
 
@@ -69,19 +59,23 @@ public class ProductoController {
             if (id != null && id > 0) {
                 producto.setId(id);
             }
+
             producto.setNombre(nombre.trim());
             producto.setDescripcion(descripcion.trim());
             producto.setCategoria(categoria != null ? categoria.trim() : "");
             producto.setPrecio(precio);
             producto.setCantidad(cantidad);
 
+            System.out.println("Guardando producto: " + producto.getNombre());
             productoRepository.save(producto);
+            System.out.println("Producto guardado exitosamente");
+
             return "redirect:/productos";
 
         } catch (Exception e) {
-            System.out.println("Error al guardar producto: " + e.getMessage());
+            System.out.println("ERROR: " + e.getMessage());
             e.printStackTrace();
-            model.addAttribute("error", "Error al guardar el producto: " + e.getMessage());
+            model.addAttribute("error", "Error: " + e.getMessage());
             model.addAttribute("producto", new Producto());
             return "productos/formulario";
         }
@@ -102,7 +96,7 @@ public class ProductoController {
         try {
             productoRepository.deleteById(id);
         } catch (Exception e) {
-            System.out.println("Error al eliminar producto: " + e.getMessage());
+            System.out.println("Error al eliminar: " + e.getMessage());
         }
         return "redirect:/productos";
     }

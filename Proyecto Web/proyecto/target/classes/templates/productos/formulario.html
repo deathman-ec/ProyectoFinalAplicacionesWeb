@@ -32,6 +32,15 @@
             text-align: center;
         }
 
+        .alert {
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
         .form-group {
             margin-bottom: 20px;
         }
@@ -108,32 +117,34 @@
     <div class="container">
         <h1 th:text="${producto.id ? 'Editar Producto' : 'Nuevo Producto'}"></h1>
 
-        <form th:action="@{/productos}" method="post" th:object="${producto}">
-            <input type="hidden" th:field="*{id}">
+        <div class="alert" th:if="${error}" th:text="${error}"></div>
+
+        <form method="post" th:action="@{/productos}">
+            <input type="hidden" name="id" th:value="${producto.id}">
 
             <div class="form-group">
                 <label for="nombre">Nombre del Producto <span class="required">*</span></label>
-                <input type="text" id="nombre" th:field="*{nombre}" required>
+                <input type="text" id="nombre" name="nombre" th:value="${producto.nombre}" required>
             </div>
 
             <div class="form-group">
                 <label for="descripcion">Descripción <span class="required">*</span></label>
-                <textarea id="descripcion" th:field="*{descripcion}" required></textarea>
+                <textarea id="descripcion" name="descripcion" required th:text="${producto.descripcion}"></textarea>
             </div>
 
             <div class="form-group">
                 <label for="categoria">Categoría</label>
-                <input type="text" id="categoria" th:field="*{categoria}" placeholder="Ej: Electrónica, Ropa, etc.">
+                <input type="text" id="categoria" name="categoria" th:value="${producto.categoria}" placeholder="Ej: Electrónica, Ropa, etc.">
             </div>
 
             <div class="form-group">
                 <label for="precio">Precio <span class="required">*</span></label>
-                <input type="number" id="precio" th:field="*{precio}" step="0.01" required>
+                <input type="number" id="precio" name="precio" th:value="${producto.precio}" step="0.01" required>
             </div>
 
             <div class="form-group">
                 <label for="cantidad">Cantidad en Stock <span class="required">*</span></label>
-                <input type="number" id="cantidad" th:field="*{cantidad}" required>
+                <input type="number" id="cantidad" name="cantidad" th:value="${producto.cantidad}" required>
             </div>
 
             <div class="form-actions">
