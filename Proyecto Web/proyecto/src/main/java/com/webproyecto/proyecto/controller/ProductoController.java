@@ -1,102 +1,85 @@
 package com.webproyecto.proyecto.controller;
 
 import com.webproyecto.proyecto.model.Producto;
-import com.webproyecto.proyecto.repository.ProductoRepository;
+import com.webproyecto.proyecto.service.CategoriaService;
+import com.webproyecto.proyecto.service.ProductoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-import java.util.Optional;
 
 @Controller
 @RequestMapping("/productos")
 public class ProductoController {
 
     @Autowired
-    private ProductoRepository productoRepository;
+    private ProductoService productoService;
+
+    @Autowired
+    private CategoriaService categoriaService;
 
     @GetMapping
-    public String listarProductos(Model model) {
-        List<Producto> productos = productoRepository.findAll();
-        model.addAttribute("productos", productos);
+    public String listar(Model model) {
+        model.addAttribute("productos", productoService.findAll());
+        model.addAttribute("alertasStock", productoService.findProductosConStockBajo());
         return "productos/lista";
     }
 
     @GetMapping("/nuevo")
-    public String mostrarFormularioNuevo(Model model) {
+    public String formularioNuevo(Model model) {
         model.addAttribute("producto", new Producto());
+        model.addAttribute("categorias", categoriaService.findAll());
         return "productos/formulario";
     }
 
+    @GetMapping("/editar/{id}")
+    public String formularioEditar(@PathVariable Long id, Model model) {
+        return productoService.findById(id).map(p -> {
+            model.addAttribute("producto", p);
+            model.addAttribute("categorias", categoriaService.findAll());
+            return "productos/formulario";
+        }).orElse("redirect:/productos");
+    }
+
     @PostMapping
-    public String guardarProducto(@RequestParam String nombre,
-                                   @RequestParam String descripcion,
-                                   @RequestParam(required = false) String categoria,
-                                   @RequestParam Double precio,
-                                   @RequestParam Integer cantidad,
-                                   @RequestParam(required = false) Long id,
-                                   Model model) {
-
-        System.out.println("=== DATOS RECIBIDOS ===");
-        System.out.println("Nombre: " + nombre);
-        System.out.println("Descripción: " + descripcion);
-        System.out.println("Categoría: " + categoria);
-        System.out.println("Precio: " + precio);
-        System.out.println("Cantidad: " + cantidad);
-        System.out.println("ID: " + id);
-        System.out.println("==================");
-
+    public String guardar(@RequestParam String nombre,
+                          @RequestParam String descripcion,
+                          @RequestParam Double precio,
+                          @RequestParam Integer cantidad,
+                          @RequestParam(required = false) Integer stockMinimo,
+                          @RequestParam(required = false) Long categoriaId,
+                          @RequestParam(required = false) Long id,
+                          Model model) {
         try {
-            // Validación básica
-            if (nombre == null || nombre.trim().isEmpty()) {
-                model.addAttribute("error", "El nombre es requerido");
-                return "productos/formulario";
-            }
-
             Producto producto = new Producto();
-            if (id != null && id > 0) {
-                producto.setId(id);
-            }
-
+            if (id != null) producto.setId(id);
             producto.setNombre(nombre.trim());
             producto.setDescripcion(descripcion.trim());
-            producto.setCategoria(categoria != null ? categoria.trim() : "");
             producto.setPrecio(precio);
             producto.setCantidad(cantidad);
+            producto.setStockMinimo(stockMinimo);
 
-            System.out.println("Guardando producto: " + producto.getNombre());
-            productoRepository.save(producto);
-            System.out.println("Producto guardado exitosamente");
+            if (categoriaId != null) {
+                categoriaService.findById(categoriaId).ifPresent(producto::setCategoria);
+            }
 
+            productoService.save(producto);
             return "redirect:/productos";
 
         } catch (Exception e) {
-            System.out.println("ERROR: " + e.getMessage());
-            e.printStackTrace();
-            model.addAttribute("error", "Error: " + e.getMessage());
+            model.addAttribute("error", "Error al guardar: " + e.getMessage());
             model.addAttribute("producto", new Producto());
+            model.addAttribute("categorias", categoriaService.findAll());
             return "productos/formulario";
         }
-    }
-
-    @GetMapping("/editar/{id}")
-    public String mostrarFormularioEditar(@PathVariable Long id, Model model) {
-        Optional<Producto> producto = productoRepository.findById(id);
-        if (producto.isPresent()) {
-            model.addAttribute("producto", producto.get());
-            return "productos/formulario";
-        }
-        return "redirect:/productos";
     }
 
     @GetMapping("/eliminar/{id}")
-    public String eliminarProducto(@PathVariable Long id) {
+    public String eliminar(@PathVariable Long id) {
         try {
-            productoRepository.deleteById(id);
+            productoService.deleteById(id);
         } catch (Exception e) {
-            System.out.println("Error al eliminar: " + e.getMessage());
+            // producto con movimientos asociados no puede eliminarse directamente
         }
         return "redirect:/productos";
     }

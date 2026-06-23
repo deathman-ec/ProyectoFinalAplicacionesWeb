@@ -22,66 +22,36 @@ public class Producto {
     @Column(nullable = false)
     private Integer cantidad;
 
-    @Column(name = "categoria")
-    private String categoria;
+    private Integer stockMinimo;
 
-    public Producto() {
-    }
+    @ManyToOne
+    @JoinColumn(name = "categoria_id")
+    private Categoria categoria;
 
-    public Producto(String nombre, String descripcion, Double precio, Integer cantidad, String categoria) {
-        this.nombre = nombre;
-        this.descripcion = descripcion;
-        this.precio = precio;
-        this.cantidad = cantidad;
-        this.categoria = categoria;
-    }
+    public Producto() {}
 
-    // Getters y Setters
-    public Long getId() {
-        return id;
-    }
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+    public String getNombre() { return nombre; }
+    public void setNombre(String nombre) { this.nombre = nombre; }
 
-    public String getNombre() {
-        return nombre;
-    }
+    public String getDescripcion() { return descripcion; }
+    public void setDescripcion(String descripcion) { this.descripcion = descripcion; }
 
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
-    }
+    public Double getPrecio() { return precio; }
+    public void setPrecio(Double precio) { this.precio = precio; }
 
-    public String getDescripcion() {
-        return descripcion;
-    }
+    public Integer getCantidad() { return cantidad; }
+    public void setCantidad(Integer cantidad) { this.cantidad = cantidad; }
 
-    public void setDescripcion(String descripcion) {
-        this.descripcion = descripcion;
-    }
+    public Integer getStockMinimo() { return stockMinimo; }
+    public void setStockMinimo(Integer stockMinimo) { this.stockMinimo = stockMinimo; }
 
-    public Double getPrecio() {
-        return precio;
-    }
+    public Categoria getCategoria() { return categoria; }
+    public void setCategoria(Categoria categoria) { this.categoria = categoria; }
 
-    public void setPrecio(Double precio) {
-        this.precio = precio;
-    }
-
-    public Integer getCantidad() {
-        return cantidad;
-    }
-
-    public void setCantidad(Integer cantidad) {
-        this.cantidad = cantidad;
-    }
-
-    public String getCategoria() {
-        return categoria;
-    }
-
-    public void setCategoria(String categoria) {
-        this.categoria = categoria;
+    public boolean isStockBajo() {
+        return stockMinimo != null && cantidad != null && cantidad < stockMinimo;
     }
 }
