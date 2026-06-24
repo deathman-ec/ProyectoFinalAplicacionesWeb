@@ -1,7 +1,7 @@
 # ProyectoFinalAplicacionesWeb
 Sistema de Gestión de Inventario
 
-Proyecto 03 - Programación Web | Spring Boot 3 + Java 21 + PostgreSQL + Thymeleaf
+Proyecto 03 - Programación Web | Spring Boot 3 + Java 21 + MariaDB + Thymeleaf
 
 ## Descripción
 Aplicación web para controlar stock de productos en múltiples sucursales. 
