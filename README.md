@@ -19,5 +19,5 @@ Registra entradas, salidas y ajustes de inventario con trazabilidad completa.
 ## Requisitos Previos
 - JDK 21 instalado
 - Maven 3.9+
-- PostgreSQL 15+ (para perfil prod)
+- MariaDB 
 - VS Code con extensiones: Extension Pack for Java, Spring Boot Extension Pack
